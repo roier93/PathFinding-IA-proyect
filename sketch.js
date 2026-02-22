@@ -44,7 +44,7 @@ class Celda {
 }
 
 function setup() {
-    createCanvas(1000, 750);
+    createCanvas(1000, 760);
     anchoCelda = width / columnas;
     altoCelda = height / filas;
 
