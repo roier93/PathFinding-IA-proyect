@@ -33,6 +33,9 @@ class Celda {
         this.vecinos = []; 
         this.padre = null; 
         this.distancia = Infinity;
+        this.f = 0;
+        this.g = 0;
+        this.h = 0;
     }
 
     mostrar() {
@@ -109,6 +112,15 @@ function draw() {
                     }
                 }
                 actual = queue.splice(minIndex, 1)[0];
+            } else if (algoritmoActual === "A*") {
+                // Encontrar el nodo con menor f = g + h
+                let minIndex = 0;
+                for(let i = 1; i < queue.length; i++) {
+                    if(queue[i].f < queue[minIndex].f) {
+                        minIndex = i;
+                    }
+                }
+                actual = queue.splice(minIndex, 1)[0];
             }
 
             if (actual === nodoFin) {
@@ -140,11 +152,32 @@ function draw() {
                         vecino.estado !== ESTADOS.CERRADO && 
                         vecino.estado !== ESTADOS.ABIERTO && 
                         vecino !== nodoInicio) {
-                        if (algoritmoActual === "Dijkstra") {
-                            // En Dijkstra cada paso cuesta 1
+                        
+
+                        if (algoritmoActual === "A*") {
+                            let tempG = actual.g + 1; // Un paso mas cuesta 1
+                            let nuevoMejorCamino = false;
+
+                            if (vecino.estado === ESTADOS.ABIERTO) {
+                                if (tempG < vecino.g) {
+                                    vecino.g = tempG;
+                                    nuevoMejorCamino = true;
+                                }
+                            } else {
+                                vecino.g = tempG;
+                                nuevoMejorCamino = true;
+                                vecino.estado = ESTADOS.ABIERTO;
+                                queue.push(vecino);
+                            }
+
+                            // Si encontramos una mejor ruta, calculamos todo de nuevo
+                            if (nuevoMejorCamino) {
+                                vecino.h = heuristica(vecino, nodoFin);
+                                vecino.f = vecino.g + vecino.h;
+                                vecino.padre = actual;
+                            }
+                        } else if (algoritmoActual === "Dijkstra") {
                             let costoTentativo = actual.distancia + 1;
-                            
-                            // Solo actualizamos si encontramos un camino menos costoso
                             if (costoTentativo < vecino.distancia) {
                                 vecino.distancia = costoTentativo;
                                 vecino.padre = actual;
@@ -153,12 +186,13 @@ function draw() {
                                     queue.push(vecino);
                                 }
                             }
-                        }else {
-                            vecino.padre = actual;
-                            vecino.estado = ESTADOS.ABIERTO; 
-                            queue.push(vecino);
+                        } else {
+                            if (vecino.estado !== ESTADOS.ABIERTO) {
+                                vecino.estado = ESTADOS.ABIERTO;
+                                vecino.padre = actual;
+                                queue.push(vecino);
+                            }
                         }
-                        
                     }
                 }
             }
@@ -224,12 +258,15 @@ function keyPressed() {
         nodoFin = null;
     }
 
-    if ((key === 'b' || key === 'B' || key === 's' || key === 'S' || key === 'd' || key === 'D') && nodoInicio && nodoFin) {
-        if (key === 'b' || key === 'B') algoritmoActual = "BFS"
+    if ((key === 'b' || key === 'B' || key === 's' || key === 'S' || key === 'd' || key === 'D'|| key === 'a' || key === 'A') && nodoInicio && nodoFin) {
+        if (key === 'b' || key === 'B') algoritmoActual = "BFS";
         else if (key === 's' || key === 'S') algoritmoActual = "DFS";
-        else algoritmoActual = "Dijkstra";        
+        else if (key === 'd' || key === 'D') algoritmoActual = "Dijkstra";
+        else algoritmoActual = "A*";
+
         queue = [];
         camino = [];
+
         // Reiniciar estados de las celdas, excepto paredes
         for (let i = 0; i < columnas; i++) {
             for (let j = 0; j < filas; j++) {
@@ -240,10 +277,18 @@ function keyPressed() {
                 }
                 grid[i][j].padre = null;
                 grid[i][j].distancia = Infinity;
+                grid[i][j].f = 0;
+                grid[i][j].g = 0;
+                grid[i][j].h = 0;
             }
         }
         nodoInicio.distancia = 0; 
         queue.push(nodoInicio);
         algoritmoCorriendo = true;
     }   
+}
+
+// Funcion para calcular la Distancia Manhattan para A*
+function heuristica(a, b) {
+    return abs(a.i - b.i) + abs(a.j - b.j);
 }
