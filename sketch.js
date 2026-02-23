@@ -67,11 +67,15 @@ class Celda {
 }
 
 function setup() {
-    createCanvas(600, 600); // O el tamaño que le hayas puesto
+    // 1. Creamos el lienzo y lo metemos en su contenedor
+    let canvas = createCanvas(500, 500);
+    canvas.parent('lienzo-container'); 
+
+    // 2. Calculamos el tamaño de cada celda 
     anchoCelda = width / columnas;
     altoCelda = height / filas;
 
-    // 1. Inicializar la cuadrícula bidimensional
+    // 3. Inicializar la cuadrícula bidimensional
     for (let i = 0; i < columnas; i++) {
         grid[i] = [];
         for (let j = 0; j < filas; j++) {
@@ -79,7 +83,7 @@ function setup() {
         }
     }
 
-    // 2. NUEVO: Decirle a cada celda que busque a sus vecinos
+    // 4. Decirle a cada celda que busque a sus vecinos
     for (let i = 0; i < columnas; i++) {
         for (let j = 0; j < filas; j++) {
             grid[i][j].addNeighbors(grid);
@@ -90,10 +94,10 @@ function setup() {
 function draw() {
     background(255);
 
-    // LÓGICA DEL ALGORITMO PASO A PASO
+    // LÓGICA DEL ALGORITMO 
     if (algoritmoCorriendo) {
         if (queue.length > 0) {
-            // BFS usa Cola (FIFO): sacamos el primer elemento [cite: 25]
+            // BFS usa Cola (FIFO): sacamos el primer elemento
             let actual = queue.shift(); 
 
             // ¿Llegamos al final?
@@ -101,19 +105,19 @@ function draw() {
                 algoritmoCorriendo = false;
                 console.log("¡Camino encontrado!");
                 
-                // Reconstruir el camino óptimo final [cite: 18]
+                // Reconstruir el camino óptimo final 
                 let temp = actual;
                 camino = [];
                 while (temp.padre) {
                     camino.push(temp.padre);
                     temp = temp.padre;
                 }
-                // Pintar el camino de Amarillo [cite: 18]
+                // Pintar el camino de Amarillo 
                 for (let i = 0; i < camino.length; i++) {
                     if (camino[i] !== nodoInicio) camino[i].estado = ESTADOS.CAMINO;
                 }
             } else {
-                // Marcar nodo evaluado como CERRADO (Rojo) [cite: 18, 40]
+                // Marcar nodo evaluado como CERRADO (Rojo) 
                 if (actual !== nodoInicio) {
                     actual.estado = ESTADOS.CERRADO; 
                 }
@@ -128,14 +132,14 @@ function draw() {
                         vecino.estado !== ESTADOS.ABIERTO && 
                         vecino !== nodoInicio) {
                         
-                        vecino.estado = ESTADOS.ABIERTO; // Nodos por visitar (Verde) [cite: 18, 40]
+                        vecino.estado = ESTADOS.ABIERTO; // Nodos por visitar (Verde)
                         vecino.padre = actual;
                         queue.push(vecino); // Se encola
                     }
                 }
             }
         } else {
-            // La cola se vació y no llegamos al final (ej. está encerrado entre paredes)
+            // La cola se vació y no llegamos al final 
             console.log("No hay solución");
             algoritmoCorriendo = false;
         }
@@ -183,7 +187,7 @@ function keyPressed() {
     if (key === 'p' || key === 'P') pincelActual = "PARED";
     if (key === 'i' || key === 'I') pincelActual = "INICIO";
     if (key === 'f' || key === 'F') pincelActual = "FIN";
-    if (key === 'v' || key === 'V') pincelActual = "BORRAR"; // V de Vacío
+    if (key === 'v' || key === 'V') pincelActual = "BORRAR"; 
     
     // C para reiniciar el tablero 
     if (key === 'c' || key === 'C') {
@@ -199,7 +203,7 @@ function keyPressed() {
     if ((key === 'b' || key === 'B') && nodoInicio && nodoFin ) {
         queue = [];
         camino = [];
-        // Reiniciar estados de las celdas (excepto paredes)
+        // Reiniciar estados de las celdas menos paredes
         for (let i = 0; i < columnas; i++) {
             for (let j = 0; j < filas; j++) {
                 if (grid[i][j].estado === ESTADOS.ABIERTO || 

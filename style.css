@@ -8,8 +8,33 @@ body {
     margin: 0;
     padding: 20px;
 }
-
 canvas {
     box-shadow: 0 0 10px rgba(0,0,0,0.5);
     cursor: crosshair;
+}
+h2 {
+    margin-bottom: 30px;
+}
+.contenedor-principal {
+    display: flex;
+    flex-direction: row;
+    gap: 10px; 
+    align-items: flex-start; 
+}
+.panel-lateral {
+    background-color: #333;
+    padding: 20px;
+    border-radius: 8px;
+    min-width: 250px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+}
+.panel-lateral h3 {
+    margin-top: 0;
+    color: #4CAF50; 
+}
+.panel-lateral ul {
+    list-style-type: none;
+    padding: 0;
+    margin-bottom: 20px;
+    line-height: 1.8;
 }

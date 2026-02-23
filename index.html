@@ -9,8 +9,30 @@
 </head>
 <body>
     <h2>Visualizador de Algoritmos - IA</h2>
-    <p>Dibuja obstáculos con el clic del mouse.</p>
-    <script src="sketch.js"></script>
     
+    <div class="contenedor-principal">
+        
+        <div class="panel-lateral">
+            <h3>Controles</h3>
+            <ul>
+                <li><strong>Clic:</strong> Dibujar en el tablero</li>
+                <li><strong>P:</strong> Dibujar Paredes (Negro)</li>
+                <li><strong>I:</strong> Marcar Inicio (Azul)</li>
+                <li><strong>F:</strong> Marcar Fin (Purpura)</li>
+                <li><strong>V:</strong> Borrador</li>
+                <li><strong>C:</strong> Limpiar todo el tablero</li>
+            </ul>
+            <h3>Algoritmos</h3>
+            <ul>
+                <li><strong>B:</strong> Iniciar BFS (Anchura)</li>
+                <li><strong>S:</strong> Iniciar DFS (Profundidad)</li>
+            </ul>
+        </div>
+
+        <div id="lienzo-container"></div>
+        
+    </div>
+
+    <script src="sketch.js"></script>
 </body>
 </html>
