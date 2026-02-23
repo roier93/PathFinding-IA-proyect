@@ -9,6 +9,11 @@ let nodoInicio = null;
 let nodoFin = null;
 let pincelActual = "PARED"; // Modos: PARED, INICIO, FIN, BORRAR
 
+//Variables para el algoritmo BFS
+let queue = []; // Cola FIFO para BFS 
+let algoritmoCorriendo = false;
+let camino = [];
+
 // Diccionario de estados y colores [cite: 18]
 const ESTADOS = {
     VACIO: "Blanco",
@@ -26,18 +31,22 @@ class Celda {
         this.j = j;
         this.estado = ESTADOS.VACIO; 
         this.vecinos = []; 
+        this.padre = null; // Para reconstruir el camino
     }
 
     mostrar() {
-        switch(this.estado) {
-            case ESTADOS.VACIO: fill(255); break;
-            case ESTADOS.INICIO: fill(0, 0, 255); break;
-            case ESTADOS.FIN: fill(128, 0, 128); break;
-            case ESTADOS.PARED: fill(0); break;
-            case ESTADOS.ABIERTO: fill(0, 255, 0); break;
-            case ESTADOS.CERRADO: fill(255, 0, 0); break;
-            case ESTADOS.CAMINO: fill(255, 255, 0); break;
-        }
+        if (this === nodoInicio) {
+            fill(0, 0, 255); // Azul para el inicio
+        } else if (this === nodoFin) {
+            fill(128, 0, 128); // Púrpura para el fin
+        }else
+            switch(this.estado) {
+                case ESTADOS.VACIO: fill(255); break;
+                case ESTADOS.PARED: fill(0); break; // Negro 
+                case ESTADOS.ABIERTO: fill(0, 255, 0); break; // Verde 
+                case ESTADOS.CERRADO: fill(255, 0, 0); break; // Rojo 
+                case ESTADOS.CAMINO: fill(255, 255, 0); break; // Amarillo 
+            }
         stroke(200);
         rect(this.i * anchoCelda, this.j * altoCelda, anchoCelda, altoCelda);
     }
@@ -80,6 +89,59 @@ function setup() {
 
 function draw() {
     background(255);
+
+    // LÓGICA DEL ALGORITMO PASO A PASO
+    if (algoritmoCorriendo) {
+        if (queue.length > 0) {
+            // BFS usa Cola (FIFO): sacamos el primer elemento [cite: 25]
+            let actual = queue.shift(); 
+
+            // ¿Llegamos al final?
+            if (actual === nodoFin) {
+                algoritmoCorriendo = false;
+                console.log("¡Camino encontrado!");
+                
+                // Reconstruir el camino óptimo final [cite: 18]
+                let temp = actual;
+                camino = [];
+                while (temp.padre) {
+                    camino.push(temp.padre);
+                    temp = temp.padre;
+                }
+                // Pintar el camino de Amarillo [cite: 18]
+                for (let i = 0; i < camino.length; i++) {
+                    if (camino[i] !== nodoInicio) camino[i].estado = ESTADOS.CAMINO;
+                }
+            } else {
+                // Marcar nodo evaluado como CERRADO (Rojo) [cite: 18, 40]
+                if (actual !== nodoInicio) {
+                    actual.estado = ESTADOS.CERRADO; 
+                }
+
+                // Revisar a los vecinos
+                for (let i = 0; i < actual.vecinos.length; i++) {
+                    let vecino = actual.vecinos[i];
+                    
+                    // Si el vecino es válido (no es pared, ni está cerrado, ni abierto)
+                    if (vecino.estado !== ESTADOS.PARED && 
+                        vecino.estado !== ESTADOS.CERRADO && 
+                        vecino.estado !== ESTADOS.ABIERTO && 
+                        vecino !== nodoInicio) {
+                        
+                        vecino.estado = ESTADOS.ABIERTO; // Nodos por visitar (Verde) [cite: 18, 40]
+                        vecino.padre = actual;
+                        queue.push(vecino); // Se encola
+                    }
+                }
+            }
+        } else {
+            // La cola se vació y no llegamos al final (ej. está encerrado entre paredes)
+            console.log("No hay solución");
+            algoritmoCorriendo = false;
+        }
+    }
+
+    // Dibujar todas las celdas actualizadas en la pantalla
     for (let i = 0; i < columnas; i++) {
         for (let j = 0; j < filas; j++) {
             grid[i][j].mostrar();
@@ -133,4 +195,23 @@ function keyPressed() {
         nodoInicio = null;
         nodoFin = null;
     }
+
+    if ((key === 'b' || key === 'B') && nodoInicio && nodoFin ) {
+        queue = [];
+        camino = [];
+        // Reiniciar estados de las celdas (excepto paredes)
+        for (let i = 0; i < columnas; i++) {
+            for (let j = 0; j < filas; j++) {
+                if (grid[i][j].estado === ESTADOS.ABIERTO || 
+                    grid[i][j].estado === ESTADOS.CERRADO || 
+                    grid[i][j].estado === ESTADOS.CAMINO) {
+                    grid[i][j].estado = ESTADOS.VACIO;
+                }
+                grid[i][j].padre = null;
+            }
+        }
+        // Iniciar BFS
+        queue.push(nodoInicio);
+        algoritmoCorriendo = true;
+    }   
 }
