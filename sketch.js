@@ -1,3 +1,13 @@
+/*
+    Pathfinding Visualizer con p5.js
+    Autor: Rogelio Díaz Saucedo
+    Num. Control: 22170631
+    Fecha: 25 de febrero de 2026
+    Materia: Inteligencia Artificial
+    Maestro: Jose Luis Medina Jimenez
+*/
+
+
 let columnas = 10;
 let filas = 10;
 let anchoCelda, altoCelda;
@@ -42,7 +52,7 @@ class Celda {
         if (this === nodoInicio) {
             fill(0, 0, 255); // Azul para el inicio
         } else if (this === nodoFin) {
-            fill(128, 0, 128); // Púrpura para el fin
+            fill(128, 0, 128); // Purpura para el fin
         }else
             switch(this.estado) {
                 case ESTADOS.VACIO: fill(255); break;
@@ -77,7 +87,7 @@ function setup() {
     anchoCelda = width / columnas;
     altoCelda = height / filas;
 
-    //Inicializar la cuadrícula 
+    //Inicializar la cuadricula 
     for (let i = 0; i < columnas; i++) {
         grid[i] = [];
         for (let j = 0; j < filas; j++) {
@@ -95,7 +105,7 @@ function setup() {
 function draw() {
     background(255);
 
-    // LÓGICA DEL ALGORITMO PASO A PASO
+    // LOGICA DEL ALGORITMO PASO A PASO
     if (algoritmoCorriendo) {
         if (queue.length > 0) {
             let actual;
@@ -147,7 +157,7 @@ function draw() {
                 for (let i = 0; i < actual.vecinos.length; i++) {
                     let vecino = actual.vecinos[i];
                     
-                    // Si el vecino es válido (no es pared, ni está cerrado, ni abierto)
+                    // Si el vecino es valido (no es pared, ni está cerrado, ni abierto)
                     if (vecino.estado !== ESTADOS.PARED && 
                         vecino.estado !== ESTADOS.CERRADO && 
                         vecino.estado !== ESTADOS.ABIERTO && 
@@ -197,7 +207,7 @@ function draw() {
                 }
             }
         } else {
-            // La cola se vació y no llegamos al final 
+            // La cola se vacio y no llegamos al final 
             console.log("No hay solución");
             algoritmoCorriendo = false;
         }
