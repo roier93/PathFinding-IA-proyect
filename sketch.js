@@ -1,4 +1,3 @@
-// Variables globales
 let columnas = 10;
 let filas = 10;
 let anchoCelda, altoCelda;
@@ -7,14 +6,14 @@ let grid = [];
 // Variables para controlar el inicio y fin
 let nodoInicio = null;
 let nodoFin = null;
-let pincelActual = "PARED"; // Modos: PARED, INICIO, FIN, BORRAR
+let pincelActual = "PARED"; 
 
 //Variables para el algoritmo BFS
 let queue = []; // Cola FIFO para BFS 
 let algoritmoCorriendo = false;
 let camino = [];
 
-// Diccionario de estados y colores [cite: 18]
+// Diccionario de estados y colores 
 const ESTADOS = {
     VACIO: "Blanco",
     INICIO: "Azul",
@@ -31,7 +30,7 @@ class Celda {
         this.j = j;
         this.estado = ESTADOS.VACIO; 
         this.vecinos = []; 
-        this.padre = null; // Para reconstruir el camino
+        this.padre = null; 
     }
 
     mostrar() {
@@ -67,15 +66,13 @@ class Celda {
 }
 
 function setup() {
-    // 1. Creamos el lienzo y lo metemos en su contenedor
     let canvas = createCanvas(500, 500);
     canvas.parent('lienzo-container'); 
 
-    // 2. Calculamos el tamaño de cada celda 
     anchoCelda = width / columnas;
     altoCelda = height / filas;
 
-    // 3. Inicializar la cuadrícula bidimensional
+    //Inicializar la cuadrícula 
     for (let i = 0; i < columnas; i++) {
         grid[i] = [];
         for (let j = 0; j < filas; j++) {
@@ -83,7 +80,6 @@ function setup() {
         }
     }
 
-    // 4. Decirle a cada celda que busque a sus vecinos
     for (let i = 0; i < columnas; i++) {
         for (let j = 0; j < filas; j++) {
             grid[i][j].addNeighbors(grid);
@@ -94,18 +90,15 @@ function setup() {
 function draw() {
     background(255);
 
-    // LÓGICA DEL ALGORITMO 
+    // LÓGICA DEL ALGORITMO PASO A PASO
     if (algoritmoCorriendo) {
         if (queue.length > 0) {
-            // BFS usa Cola (FIFO): sacamos el primer elemento
             let actual = queue.shift(); 
 
-            // ¿Llegamos al final?
             if (actual === nodoFin) {
                 algoritmoCorriendo = false;
                 console.log("¡Camino encontrado!");
                 
-                // Reconstruir el camino óptimo final 
                 let temp = actual;
                 camino = [];
                 while (temp.padre) {
@@ -117,7 +110,7 @@ function draw() {
                     if (camino[i] !== nodoInicio) camino[i].estado = ESTADOS.CAMINO;
                 }
             } else {
-                // Marcar nodo evaluado como CERRADO (Rojo) 
+                // Marcar nodo evaluado como CERRADO (Rojo)
                 if (actual !== nodoInicio) {
                     actual.estado = ESTADOS.CERRADO; 
                 }
@@ -132,9 +125,9 @@ function draw() {
                         vecino.estado !== ESTADOS.ABIERTO && 
                         vecino !== nodoInicio) {
                         
-                        vecino.estado = ESTADOS.ABIERTO; // Nodos por visitar (Verde)
+                        vecino.estado = ESTADOS.ABIERTO; // Nodos por visitar (Verde) 
                         vecino.padre = actual;
-                        queue.push(vecino); // Se encola
+                        queue.push(vecino); 
                     }
                 }
             }
@@ -182,7 +175,7 @@ function dibujarEscenario() {
     }
 }
 
-// Controles del teclado [cite: 32, 37]
+// Controles del teclado
 function keyPressed() {
     if (key === 'p' || key === 'P') pincelActual = "PARED";
     if (key === 'i' || key === 'I') pincelActual = "INICIO";
@@ -203,7 +196,7 @@ function keyPressed() {
     if ((key === 'b' || key === 'B') && nodoInicio && nodoFin ) {
         queue = [];
         camino = [];
-        // Reiniciar estados de las celdas menos paredes
+        // Reiniciar estados de las celdas, excepto paredes
         for (let i = 0; i < columnas; i++) {
             for (let j = 0; j < filas; j++) {
                 if (grid[i][j].estado === ESTADOS.ABIERTO || 
