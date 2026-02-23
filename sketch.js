@@ -8,9 +8,10 @@ let nodoInicio = null;
 let nodoFin = null;
 let pincelActual = "PARED"; 
 
-//Variables para el algoritmo BFS
-let queue = []; // Cola FIFO para BFS 
+//Variables para los algoritmos
+let queue = []; 
 let algoritmoCorriendo = false;
+let algoritmoActual = "";
 let camino = [];
 
 // Diccionario de estados y colores 
@@ -93,11 +94,16 @@ function draw() {
     // LÓGICA DEL ALGORITMO PASO A PASO
     if (algoritmoCorriendo) {
         if (queue.length > 0) {
-            let actual = queue.shift(); 
+            let actual;
+            if (algoritmoActual === "BFS") {
+                actual = queue.shift(); 
+            } else {
+                actual = queue.pop(); 
+            }
 
             if (actual === nodoFin) {
                 algoritmoCorriendo = false;
-                console.log("¡Camino encontrado!");
+                console.log("¡Camino encontrado!" + algoritmoActual);
                 
                 let temp = actual;
                 camino = [];
@@ -193,7 +199,9 @@ function keyPressed() {
         nodoFin = null;
     }
 
-    if ((key === 'b' || key === 'B') && nodoInicio && nodoFin ) {
+    if ((key === 'b' || key === 'B' || key === 's' || key === 'S') && nodoInicio && nodoFin) {
+        algoritmoActual = (key === 'b' || key === 'B') ? "BFS" : "DFS";
+        
         queue = [];
         camino = [];
         // Reiniciar estados de las celdas, excepto paredes
