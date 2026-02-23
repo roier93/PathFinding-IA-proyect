@@ -41,17 +41,39 @@ class Celda {
         stroke(200);
         rect(this.i * anchoCelda, this.j * altoCelda, anchoCelda, altoCelda);
     }
+
+    addNeighbors(grid) {
+        let i = this.i;
+        let j = this.j;
+        
+        // Derecha
+        if (i < columnas - 1) this.vecinos.push(grid[i + 1][j]);
+        // Izquierda
+        if (i > 0) this.vecinos.push(grid[i - 1][j]);
+        // Abajo
+        if (j < filas - 1) this.vecinos.push(grid[i][j + 1]);
+        // Arriba
+        if (j > 0) this.vecinos.push(grid[i][j - 1]);
+    }
 }
 
 function setup() {
-    createCanvas(1000, 760);
+    createCanvas(600, 600); // O el tamaño que le hayas puesto
     anchoCelda = width / columnas;
     altoCelda = height / filas;
 
+    // 1. Inicializar la cuadrícula bidimensional
     for (let i = 0; i < columnas; i++) {
         grid[i] = [];
         for (let j = 0; j < filas; j++) {
             grid[i][j] = new Celda(i, j);
+        }
+    }
+
+    // 2. NUEVO: Decirle a cada celda que busque a sus vecinos
+    for (let i = 0; i < columnas; i++) {
+        for (let j = 0; j < filas; j++) {
+            grid[i][j].addNeighbors(grid);
         }
     }
 }
