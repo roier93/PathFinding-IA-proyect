@@ -32,6 +32,7 @@ class Celda {
         this.estado = ESTADOS.VACIO; 
         this.vecinos = []; 
         this.padre = null; 
+        this.distancia = Infinity;
     }
 
     mostrar() {
@@ -97,8 +98,17 @@ function draw() {
             let actual;
             if (algoritmoActual === "BFS") {
                 actual = queue.shift(); 
-            } else {
+            } else if (algoritmoActual === "DFS") {
                 actual = queue.pop(); 
+            }else if (algoritmoActual === "Dijkstra") {
+                // Encontrar el nodo con menor distancia en la cola
+                let minIndex = 0;
+                for (let i = 1; i < queue.length; i++) {
+                    if (queue[i].distancia < queue[minIndex].distancia) {
+                        minIndex = i;
+                    }
+                }
+                actual = queue.splice(minIndex, 1)[0];
             }
 
             if (actual === nodoFin) {
@@ -130,10 +140,25 @@ function draw() {
                         vecino.estado !== ESTADOS.CERRADO && 
                         vecino.estado !== ESTADOS.ABIERTO && 
                         vecino !== nodoInicio) {
+                        if (algoritmoActual === "Dijkstra") {
+                            // En Dijkstra cada paso cuesta 1
+                            let costoTentativo = actual.distancia + 1;
+                            
+                            // Solo actualizamos si encontramos un camino menos costoso
+                            if (costoTentativo < vecino.distancia) {
+                                vecino.distancia = costoTentativo;
+                                vecino.padre = actual;
+                                if (vecino.estado !== ESTADOS.ABIERTO) {
+                                    vecino.estado = ESTADOS.ABIERTO;
+                                    queue.push(vecino);
+                                }
+                            }
+                        }else {
+                            vecino.padre = actual;
+                            vecino.estado = ESTADOS.ABIERTO; 
+                            queue.push(vecino);
+                        }
                         
-                        vecino.estado = ESTADOS.ABIERTO; // Nodos por visitar (Verde) 
-                        vecino.padre = actual;
-                        queue.push(vecino); 
                     }
                 }
             }
@@ -199,9 +224,10 @@ function keyPressed() {
         nodoFin = null;
     }
 
-    if ((key === 'b' || key === 'B' || key === 's' || key === 'S') && nodoInicio && nodoFin) {
-        algoritmoActual = (key === 'b' || key === 'B') ? "BFS" : "DFS";
-        
+    if ((key === 'b' || key === 'B' || key === 's' || key === 'S' || key === 'd' || key === 'D') && nodoInicio && nodoFin) {
+        if (key === 'b' || key === 'B') algoritmoActual = "BFS"
+        else if (key === 's' || key === 'S') algoritmoActual = "DFS";
+        else algoritmoActual = "Dijkstra";        
         queue = [];
         camino = [];
         // Reiniciar estados de las celdas, excepto paredes
@@ -213,9 +239,10 @@ function keyPressed() {
                     grid[i][j].estado = ESTADOS.VACIO;
                 }
                 grid[i][j].padre = null;
+                grid[i][j].distancia = Infinity;
             }
         }
-        // Iniciar BFS
+        nodoInicio.distancia = 0; 
         queue.push(nodoInicio);
         algoritmoCorriendo = true;
     }   
