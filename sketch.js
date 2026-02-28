@@ -210,6 +210,11 @@ function draw() {
             // La cola se vacio y no llegamos al final 
             console.log("No hay solución");
             algoritmoCorriendo = false;
+
+            setTimeout(() => {
+                alert("No se puede encontrar el camino");
+            }, 50);
+            
         }
     }
 
